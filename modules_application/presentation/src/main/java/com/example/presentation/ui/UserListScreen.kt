@@ -10,13 +10,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.presentation.UserListState
 import com.example.presentation.UserListViewModel
 import com.example.presentation.theme.GithubUsersTheme
 
 @Composable
-fun UserListRoute(viewModel: UserListViewModel = UserListViewModel()) {
+fun UserListRoute(viewModel: UserListViewModel = hiltViewModel()) {
     val userListState by viewModel.userListState.collectAsStateWithLifecycle()
 
     UserListScreen(

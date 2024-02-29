@@ -1,11 +1,11 @@
 package com.example.data
 
-import com.example.domain.GithubUsersRepository
+import com.example.domain.repositories.GithubUsersRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class GithubUsersRepositoryImpl : GithubUsersRepository {
+internal class GithubUsersRepositoryImpl : GithubUsersRepository {
 
     private val users = listOf(
         "user1", "user2", "user3", "user4",
@@ -15,11 +15,11 @@ class GithubUsersRepositoryImpl : GithubUsersRepository {
 
     override fun getUsers(): Flow<List<String>> {
         return flow {
-            emit(users.subList(0,3))
+            emit(users.subList(0, 3))
             delay(5000)
-            emit(users.subList(0,7))
+            emit(users.subList(0, 7))
             delay(5000)
-            emit(users.subList(0,11))
+            emit(users.subList(0, 11))
         }
     }
 }
