@@ -5,13 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.domain.GetGithubUsersUseCase
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 
-class UserListViewModel(private val githubUsersUseCase: GetGithubUsersUseCase) : ViewModel() {
+class UserListViewModel(private val githubUsersUseCase: GetGithubUsersUseCase? = null) :
+    ViewModel() {
 
-    val userListState: StateFlow<UserListState> = githubUsersUseCase()
+    val userListState: StateFlow<UserListState> = flow {
+        emit(listOf("user1", "user2", "user3"))
+    }
         .map { UserListState.Success(it) }
         .stateIn(
             scope = viewModelScope,
