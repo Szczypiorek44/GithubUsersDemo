@@ -21,6 +21,13 @@ internal class GithubUsersRepositoryImpl : GithubUsersRepository {
         User("10", "Agata"),
         User("11", "Brittany"),
         User("12", "Austin"),
+        User("13", "Blake"),
+        User("14", "Magda"),
+        User("15", "Caroline"),
+        User("16", "Pavol"),
+        User("17", "Michael"),
+        User("18", "John"),
+        User("19", "Bobby"),
     )
 
     override fun getUsers(): Flow<List<User>> {
@@ -31,6 +38,8 @@ internal class GithubUsersRepositoryImpl : GithubUsersRepository {
             emit(users.subList(0, 7))
             delay(5000)
             emit(users.subList(0, 11))
+            delay(5000)
+            emit(users.subList(0, 19))
         }
     }
 }
