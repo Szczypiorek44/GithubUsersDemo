@@ -2,6 +2,7 @@ package com.example.presentation.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,16 +32,23 @@ import com.example.presentation.UserListViewModel
 import com.example.presentation.theme.GithubUsersTheme
 
 @Composable
-fun UserListRoute(viewModel: UserListViewModel = hiltViewModel()) {
+fun UserListRoute(
+    onUserClick: (Int) -> Unit,
+    viewModel: UserListViewModel = hiltViewModel()
+) {
     val userListState by viewModel.userListState.collectAsStateWithLifecycle()
 
     UserListScreen(
+        onUserClick = onUserClick,
         userListState = userListState
     )
 }
 
 @Composable
-fun UserListScreen(userListState: UserListState) {
+fun UserListScreen(
+    onUserClick: (Int) -> Unit,
+    userListState: UserListState
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween,
@@ -52,14 +60,17 @@ fun UserListScreen(userListState: UserListState) {
             }
 
             is UserListState.Success -> {
-                UserListLazyColumn(userListState.userList)
+                UserListLazyColumn(userListState.userList, onUserClick)
             }
         }
     }
 }
 
 @Composable
-fun UserListLazyColumn(userList: List<User>) {
+fun UserListLazyColumn(
+    userList: List<User>,
+    onUserClick: (Int) -> Unit
+) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(top = 16.dp, bottom = 16.dp)
@@ -67,12 +78,15 @@ fun UserListLazyColumn(userList: List<User>) {
         items(
             items = userList,
             key = { it.id },
-            itemContent = { UserRow(it) })
+            itemContent = { UserRow(it, onUserClick) })
     }
 }
 
 @Composable
-fun UserRow(user: User) {
+fun UserRow(
+    user: User,
+    onUserClick: (Int) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -80,6 +94,7 @@ fun UserRow(user: User) {
             .padding(vertical = 4.dp)
             .background(color = Color.LightGray)
             .border(1.dp, Black)
+            .clickable(onClick = { onUserClick(user.id) })
     ) {
         Text(
             text = user.name,
@@ -97,7 +112,16 @@ fun UserRow(user: User) {
 fun UserListScreenPreview() {
     GithubUsersTheme {
         UserListScreen(
-            userListState = UserListState.Loading
+            userListState = UserListState.Success(fakeUserList),
+            onUserClick = {}
         )
     }
 }
+
+private val fakeUserList = listOf(
+    User(1, "John"),
+    User(2, "Ann"),
+    User(3, "Bob"),
+    User(4, "Julia"),
+    User(5, "Barbara"),
+)
