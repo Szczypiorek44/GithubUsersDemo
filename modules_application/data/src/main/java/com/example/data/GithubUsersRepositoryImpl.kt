@@ -1,55 +1,70 @@
 package com.example.data
 
 import com.example.data.api.GithubApi
-import com.example.data.models.GithubUser
-import com.example.data.models.mapToUserList
+import com.example.data.api.models.GithubUser
+import com.example.data.database.dao.UserDao
+import com.example.data.utils.asExternalModelList
+import com.example.data.utils.toUserEntityList
+import com.example.domain.models.FetchNextUsersResult
 import com.example.domain.models.User
 import com.example.domain.repositories.GithubUsersRepository
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.withContext
+
+
+private const val STARTING_USER_ID = 0
 
 internal class GithubUsersRepositoryImpl(
     private val githubApi: GithubApi,
-    private val scope: CoroutineScope
+    private val userDao: UserDao,
+    private val scope: CoroutineScope,
+    private val ioDispatcher: CoroutineDispatcher,
 ) : GithubUsersRepository {
 
-    private val users = listOf(
-        User(1, "John"),
-        User(2, "Arthur"),
-        User(3, "Sylvia"),
-        User(4, "Anna"),
-        User(5, "Bob"),
-        User(6, "Luke"),
-        User(7, "Barbara"),
-        User(8, "Tom"),
-        User(9, "Jerry"),
-        User(10, "Agata"),
-        User(11, "Brittany"),
-        User(12, "Austin"),
-        User(13, "Blake"),
-        User(14, "Magda"),
-        User(15, "Caroline"),
-        User(16, "Pavol"),
-        User(17, "Michael"),
-        User(18, "John"),
-        User(19, "Bobby"),
-    )
+    private val usersFlow = userDao.observeEntities()
+        .map { it.asExternalModelList() }
+        .shareIn(scope, started = SharingStarted.Lazily, replay = 1)
 
-    override fun getUsers(): Flow<List<User>> = flow {
-        downloadGithubUsers()
-            .onSuccess {
-                emit(it.mapToUserList())
-            }
-            .onFailure {
-                emptyList<User>()
-            }
-    }.stateIn(scope, initialValue = emptyList(), started = SharingStarted.Lazily)
+    override fun observeUsers(): Flow<List<User>> = usersFlow
 
-    private suspend fun downloadGithubUsers(): Result<List<GithubUser>> = runCatching {
-        githubApi.getUsers()
+    override suspend fun fetchNextUsers(): FetchNextUsersResult = withContext(ioDispatcher) {
+        val lastUserId = getLastUserId()
+        downloadAndStoreUsers(lastUserId)
+    }
+
+    override suspend fun getUser(userId: Int): User? {
+        return usersFlow.first()
+            .find { it.id == userId }
+    }
+
+    private suspend fun downloadAndStoreUsers(sinceId: Int): FetchNextUsersResult {
+        val downloadResult = downloadGithubUsers(sinceId)
+
+        val githubUsers = downloadResult.getOrNull()
+        if (githubUsers == null) {
+            downloadResult.exceptionOrNull()?.printStackTrace()
+            return FetchNextUsersResult.Error
+        }
+
+        userDao.insertOrIgnore(githubUsers.toUserEntityList())
+        return FetchNextUsersResult.Success
+    }
+
+    private suspend fun getLastUserId(): Int {
+        val lastEmittedUser = usersFlow.first()
+            .lastOrNull()
+
+        return lastEmittedUser?.id ?: STARTING_USER_ID
+    }
+
+    private suspend fun downloadGithubUsers(since: Int): Result<List<GithubUser>> = runCatching {
+        githubApi.getUsers(since)
     }
 }
 

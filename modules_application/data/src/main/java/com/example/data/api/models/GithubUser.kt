@@ -1,6 +1,5 @@
-package com.example.data.models
+package com.example.data.api.models
 
-import com.example.domain.models.User
 import com.google.gson.annotations.SerializedName
 
 data class GithubUser(
@@ -9,7 +8,3 @@ data class GithubUser(
     @SerializedName("login")
     val login: String,
 )
-
-fun List<GithubUser>.mapToUserList(): List<User> = this.map {
-    User(it.id, it.login)
-}

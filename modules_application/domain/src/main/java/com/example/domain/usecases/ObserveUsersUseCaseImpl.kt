@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 
-internal class GetGithubUsersUseCaseImpl @Inject constructor(
+internal class ObserveUsersUseCaseImpl @Inject constructor(
     private val githubUsersRepository: GithubUsersRepository
-) : GetGithubUsersUseCase {
+) : ObserveUsersUseCase {
     override fun invoke(): Flow<List<User>> {
-        return githubUsersRepository.getUsers()
+        return githubUsersRepository.observeUsers()
     }
 }
