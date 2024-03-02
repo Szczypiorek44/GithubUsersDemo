@@ -17,9 +17,9 @@ fun AppNavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-        userListScreen(
-            onUserClick = { navController.navigateToUserDetails(it) }
+        listScreen(
+            onUserClick = { navController.navigateToDetails(it) }
         )
-        userDetailsScreen()
+        detailsScreen()
     }
 }

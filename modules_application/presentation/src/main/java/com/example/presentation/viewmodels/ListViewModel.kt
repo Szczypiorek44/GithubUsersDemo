@@ -1,4 +1,4 @@
-package com.example.presentation
+package com.example.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,23 +14,22 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class UserListViewModel @Inject constructor(
+class ListViewModel @Inject constructor(
     private val observeUsersUseCase: ObserveUsersUseCase,
     private val fetchNextUsersUseCase: FetchNextUsersUseCase
-) :
-    ViewModel() {
+) : ViewModel() {
 
-    val userListState: StateFlow<UserListState> = observeUsersUseCase()
-        .map { UserListState.Success(it) }
+    val listState: StateFlow<ListState> = observeUsersUseCase()
+        .map { ListState.Success(it) }
         .stateIn(
             scope = viewModelScope,
-            initialValue = UserListState.Loading,
+            initialValue = ListState.Loading,
             started = SharingStarted.WhileSubscribed(5_000)
         )
 }
 
-sealed interface UserListState {
-    data object Loading : UserListState
+sealed interface ListState {
+    data object Loading : ListState
 
-    data class Success(val userList: List<User>) : UserListState
+    data class Success(val userList: List<User>) : ListState
 }

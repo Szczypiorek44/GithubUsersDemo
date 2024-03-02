@@ -27,40 +27,40 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.models.User
 import com.example.presentation.R
-import com.example.presentation.UserListState
-import com.example.presentation.UserListViewModel
 import com.example.presentation.theme.GithubUsersTheme
+import com.example.presentation.viewmodels.ListState
+import com.example.presentation.viewmodels.ListViewModel
 
 @Composable
-fun UserListRoute(
+fun ListRoute(
     onUserClick: (Int) -> Unit,
-    viewModel: UserListViewModel = hiltViewModel()
+    viewModel: ListViewModel = hiltViewModel()
 ) {
-    val userListState by viewModel.userListState.collectAsStateWithLifecycle()
+    val listState by viewModel.listState.collectAsStateWithLifecycle()
 
-    UserListScreen(
+    ListScreen(
         onUserClick = onUserClick,
-        userListState = userListState
+        listState = listState
     )
 }
 
 @Composable
-fun UserListScreen(
+fun ListScreen(
     onUserClick: (Int) -> Unit,
-    userListState: UserListState
+    listState: ListState
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (userListState) {
-            is UserListState.Loading -> {
+        when (listState) {
+            is ListState.Loading -> {
                 Text(text = stringResource(R.string.loading))
             }
 
-            is UserListState.Success -> {
-                UserListLazyColumn(userListState.userList, onUserClick)
+            is ListState.Success -> {
+                UserListLazyColumn(listState.userList, onUserClick)
             }
         }
     }
@@ -109,16 +109,16 @@ fun UserRow(
 
 @Preview(showBackground = true)
 @Composable
-fun UserListScreenPreview() {
+fun ListScreenPreview() {
     GithubUsersTheme {
-        UserListScreen(
-            userListState = UserListState.Success(fakeUserList),
+        ListScreen(
+            listState = ListState.Success(fakeUserList),
             onUserClick = {}
         )
     }
 }
 
-private val fakeUserList = listOf(
+val fakeUserList = listOf(
     User(1, "John"),
     User(2, "Ann"),
     User(3, "Bob"),

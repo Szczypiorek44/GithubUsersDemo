@@ -38,8 +38,8 @@ internal class GithubUsersRepositoryImpl(
         downloadAndStoreUsers(lastUserId)
     }
 
-    override suspend fun getUser(userId: Int): User? {
-        return usersFlow.first()
+    override suspend fun getUser(userId: Int): User? = withContext(ioDispatcher) {
+        usersFlow.first()
             .find { it.id == userId }
     }
 

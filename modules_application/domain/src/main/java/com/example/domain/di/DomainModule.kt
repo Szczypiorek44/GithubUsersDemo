@@ -3,6 +3,8 @@ package com.example.domain.di
 import com.example.domain.repositories.GithubUsersRepository
 import com.example.domain.usecases.FetchNextUsersUseCase
 import com.example.domain.usecases.FetchNextUsersUseCaseImpl
+import com.example.domain.usecases.GetUserUseCase
+import com.example.domain.usecases.GetUserUseCaseImpl
 import com.example.domain.usecases.ObserveUsersUseCase
 import com.example.domain.usecases.ObserveUsersUseCaseImpl
 import dagger.Module
@@ -15,14 +17,20 @@ import dagger.hilt.components.SingletonComponent
 object DomainModule {
 
     @Provides
-    fun provideObserveUsersUseCase(
-        githubUsersRepository: GithubUsersRepository
-    ): ObserveUsersUseCase =
-        ObserveUsersUseCaseImpl(githubUsersRepository)
-
-    @Provides
     fun provideFetchNextUsersUseCase(
         githubUsersRepository: GithubUsersRepository
     ): FetchNextUsersUseCase =
         FetchNextUsersUseCaseImpl(githubUsersRepository)
+
+    @Provides
+    fun provideGetUserUseCase(
+        githubUsersRepository: GithubUsersRepository
+    ): GetUserUseCase =
+        GetUserUseCaseImpl(githubUsersRepository)
+
+    @Provides
+    fun provideObserveUsersUseCase(
+        githubUsersRepository: GithubUsersRepository
+    ): ObserveUsersUseCase =
+        ObserveUsersUseCaseImpl(githubUsersRepository)
 }
