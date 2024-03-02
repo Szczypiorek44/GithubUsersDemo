@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserDao {
 
-    @Query(value = "SELECT * FROM users")
+    @Query(value = "SELECT * FROM users ORDER BY id ASC")
     fun observeEntities(): Flow<List<UserEntity>>
 
     @Query("SELECT * FROM users")

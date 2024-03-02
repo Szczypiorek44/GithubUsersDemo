@@ -6,30 +6,49 @@ import com.example.domain.models.User
 import com.example.domain.usecases.FetchNextUsersUseCase
 import com.example.domain.usecases.ObserveUsersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
 @HiltViewModel
 class ListViewModel @Inject constructor(
-    private val observeUsersUseCase: ObserveUsersUseCase,
+    observeUsersUseCase: ObserveUsersUseCase,
     private val fetchNextUsersUseCase: FetchNextUsersUseCase
 ) : ViewModel() {
 
-    val listState: StateFlow<ListState> = observeUsersUseCase()
-        .map { ListState.Success(it) }
+    val userListState: StateFlow<List<User>> = observeUsersUseCase()
         .stateIn(
             scope = viewModelScope,
-            initialValue = ListState.Loading,
+            initialValue = emptyList(),
             started = SharingStarted.WhileSubscribed(5_000)
         )
-}
 
-sealed interface ListState {
-    data object Loading : ListState
+    private val _loadingState = MutableStateFlow(false)
+    val loadingState = _loadingState.asStateFlow()
 
-    data class Success(val userList: List<User>) : ListState
+    init {
+        viewModelScope.launch {
+            val firstUserList = observeUsersUseCase().first()
+            if (firstUserList.isEmpty()) {
+                fetchNextUsers()
+            }
+        }
+    }
+
+    fun fetchNextUsers() {
+        viewModelScope.launch {
+            _loadingState.value = true
+            val fetchResult = fetchNextUsersUseCase()
+            if (fetchResult is Error) {
+                //TODO show error
+            }
+            _loadingState.value = false
+        }
+    }
 }
