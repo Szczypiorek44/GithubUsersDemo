@@ -24,7 +24,7 @@ class GithubUsersRepositoryTests {
 
     private val fakeUserDao = FakeUserDao()
 
-    private val promoCodesRepository = GithubUsersRepositoryImpl(
+    private val githubUsersRepository = GithubUsersRepositoryImpl(
         githubApi = fakeGithubApi,
         userDao = fakeUserDao,
         ioDispatcher = UnconfinedTestDispatcher(),
@@ -33,7 +33,7 @@ class GithubUsersRepositoryTests {
 
     @Test
     fun when_daoEmits_expect_newObservedUsers() = runTest {
-        val usersFlow = promoCodesRepository.observeUsers()
+        val usersFlow = githubUsersRepository.observeUsers()
 
         val fakeEntities = fakeGithubUsers.toUserEntityList()
 
@@ -46,7 +46,7 @@ class GithubUsersRepositoryTests {
 
     @Test
     fun when_daoDoesntEmit_expect_noUsersObserved() = runTest {
-        val usersFlow = promoCodesRepository.observeUsers()
+        val usersFlow = githubUsersRepository.observeUsers()
 
         usersFlow.test {
             expectNoEvents()
@@ -55,7 +55,7 @@ class GithubUsersRepositoryTests {
 
     @Test
     fun when_daoEmitsMultiple_expect_multipleUsersObserved() = runTest {
-        val usersFlow = promoCodesRepository.observeUsers()
+        val usersFlow = githubUsersRepository.observeUsers()
 
         val fakeEntities = fakeGithubUsers.toUserEntityList()
 

@@ -42,7 +42,7 @@ object RetrofitModule {
     fun provideOkHttpCallFactory(loggingInterceptor: HttpLoggingInterceptor): Call.Factory {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .build();
+            .build()
     }
 
     @Provides
