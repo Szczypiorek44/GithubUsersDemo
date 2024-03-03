@@ -1,11 +1,10 @@
-package com.example.presentation.navigation
+package com.example.presentation.features.details
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.presentation.ui.DetailsRoute
 
 const val USER_DETAILS_ROUTE = "user_details_route"
 

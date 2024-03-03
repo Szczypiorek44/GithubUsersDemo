@@ -1,4 +1,4 @@
-package com.example.presentation.ui
+package com.example.presentation.features.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,12 +33,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.models.User
 import com.example.presentation.R
+import com.example.presentation.common.hasScrolledToBottom
+import com.example.presentation.features.list.FetchMoreState.Error
+import com.example.presentation.features.list.FetchMoreState.NoMoreItems
+import com.example.presentation.features.list.FetchMoreState.WaitingForMore
 import com.example.presentation.theme.GithubUsersTheme
-import com.example.presentation.viewmodels.FetchMoreState
-import com.example.presentation.viewmodels.FetchMoreState.Error
-import com.example.presentation.viewmodels.FetchMoreState.NoMoreItems
-import com.example.presentation.viewmodels.FetchMoreState.WaitingForMore
-import com.example.presentation.viewmodels.ListViewModel
 
 @Composable
 fun ListRoute(

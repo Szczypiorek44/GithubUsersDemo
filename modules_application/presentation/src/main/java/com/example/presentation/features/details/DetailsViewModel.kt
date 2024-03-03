@@ -1,10 +1,10 @@
-package com.example.presentation.viewmodels
+package com.example.presentation.features.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.domain.models.User
 import com.example.domain.usecases.GetUserUseCase
-import com.example.presentation.viewmodels.DetailsViewModel.DetailsViewModelFactory
+import com.example.presentation.features.details.DetailsViewModel.DetailsViewModelFactory
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

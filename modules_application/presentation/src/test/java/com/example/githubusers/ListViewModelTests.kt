@@ -6,7 +6,7 @@ import com.example.githubusers.mocks.FakeFetchNextUsersUseCase
 import com.example.githubusers.mocks.FakeObserveUsersUseCase
 import com.example.githubusers.mocks.fakeUsers
 import com.example.githubusers.rules.MainDispatcherRule
-import com.example.presentation.viewmodels.ListViewModel
+import com.example.presentation.features.list.ListViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest

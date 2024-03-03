@@ -1,9 +1,13 @@
-package com.example.presentation.navigation
+package com.example.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.example.presentation.features.details.detailsScreen
+import com.example.presentation.features.details.navigateToDetails
+import com.example.presentation.features.list.USER_LIST_ROUTE
+import com.example.presentation.features.list.listScreen
 
 
 @Composable

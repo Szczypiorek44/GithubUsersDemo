@@ -1,10 +1,9 @@
-package com.example.presentation.navigation
+package com.example.presentation.features.list
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.example.presentation.ui.ListRoute
 
 const val USER_LIST_ROUTE = "user_list_route"
 

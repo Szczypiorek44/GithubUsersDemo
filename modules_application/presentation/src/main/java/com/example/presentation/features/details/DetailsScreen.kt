@@ -1,4 +1,4 @@
-package com.example.presentation.ui
+package com.example.presentation.features.details
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,10 +25,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.domain.models.User
 import com.example.presentation.R
+import com.example.presentation.features.details.DetailsViewModel.DetailsViewModelFactory
+import com.example.presentation.features.list.fakeUserList
 import com.example.presentation.theme.GithubUsersTheme
-import com.example.presentation.viewmodels.DetailsState
-import com.example.presentation.viewmodels.DetailsViewModel
-import com.example.presentation.viewmodels.DetailsViewModel.DetailsViewModelFactory
 
 
 @Composable

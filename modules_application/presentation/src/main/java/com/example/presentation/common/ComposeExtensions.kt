@@ -1,4 +1,4 @@
-package com.example.presentation.ui
+package com.example.presentation.common
 
 import androidx.compose.foundation.lazy.LazyListState
 
