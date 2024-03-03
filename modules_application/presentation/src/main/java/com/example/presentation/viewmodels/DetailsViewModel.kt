@@ -9,9 +9,9 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel(assistedFactory = DetailsViewModelFactory::class)
 class DetailsViewModel @AssistedInject constructor(
@@ -24,31 +24,22 @@ class DetailsViewModel @AssistedInject constructor(
         fun create(userId: Int): DetailsViewModel
     }
 
-    private val _detailsState = MutableStateFlow<DetailsState>(DetailsState.Loading)
-    val detailsState = _detailsState.asStateFlow()
-
-    init {
-        fetchUser()
-    }
-
-    private fun fetchUser() {
-        viewModelScope.launch {
-            val user = getUserUseCase(userId)
-            _detailsState.value = user.toDetailsState()
+    val detailsState = flow {
+        val user = getUserUseCase(userId)
+        if (user != null) {
+            emit(DetailsState.Success(user))
+        } else {
+            emit(DetailsState.NotFound)
         }
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = DetailsState.Loading,
+        started = SharingStarted.WhileSubscribed(5_000)
+    )
 }
 
 sealed interface DetailsState {
     data class Success(val user: User) : DetailsState
     data object NotFound : DetailsState
     data object Loading : DetailsState
-}
-
-fun User?.toDetailsState(): DetailsState {
-    return if (this == null) {
-        DetailsState.NotFound
-    } else {
-        DetailsState.Success(this)
-    }
 }
