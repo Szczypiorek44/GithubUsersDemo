@@ -2,6 +2,7 @@ package com.example.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.domain.models.FetchNextUsersResult
 import com.example.domain.models.User
 import com.example.domain.usecases.FetchNextUsersUseCase
 import com.example.domain.usecases.ObserveUsersUseCase
@@ -29,26 +30,48 @@ class ListViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000)
         )
 
-    private val _loadingState = MutableStateFlow(false)
-    val loadingState = _loadingState.asStateFlow()
+    private val _fetchMoreState = MutableStateFlow<FetchMoreState>(FetchMoreState.WaitingForMore)
+    val fetchMoreState = _fetchMoreState.asStateFlow()
 
     init {
         viewModelScope.launch {
             val firstUserList = observeUsersUseCase().first()
             if (firstUserList.isEmpty()) {
-                fetchNextUsers()
+                fetchMoreUsers()
             }
         }
     }
 
-    fun fetchNextUsers() {
+    fun attemptFetchMoreUsers() {
+        if (_fetchMoreState.value == FetchMoreState.NoMoreItems) {
+            return
+        }
+
+        fetchMoreUsers()
+    }
+
+    private fun fetchMoreUsers() {
         viewModelScope.launch {
-            _loadingState.value = true
-            val fetchResult = fetchNextUsersUseCase()
-            if (fetchResult is Error) {
-                //TODO show error
+            _fetchMoreState.value = FetchMoreState.WaitingForMore
+            when (val fetchResult = fetchNextUsersUseCase()) {
+                is FetchNextUsersResult.Error -> {
+                    _fetchMoreState.value = FetchMoreState.Error
+                }
+
+                is FetchNextUsersResult.Success -> {
+                    if (fetchResult.canFetchMoreUsers) {
+                        _fetchMoreState.value = FetchMoreState.WaitingForMore
+                    } else {
+                        _fetchMoreState.value = FetchMoreState.NoMoreItems
+                    }
+                }
             }
-            _loadingState.value = false
         }
     }
+}
+
+sealed interface FetchMoreState {
+    data object WaitingForMore : FetchMoreState
+    data object NoMoreItems : FetchMoreState
+    data object Error : FetchMoreState
 }

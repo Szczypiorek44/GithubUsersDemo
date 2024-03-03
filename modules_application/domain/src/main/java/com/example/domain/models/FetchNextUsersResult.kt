@@ -1,7 +1,7 @@
 package com.example.domain.models
 
 sealed interface FetchNextUsersResult {
-    data object Success : FetchNextUsersResult
+    data class Success(val canFetchMoreUsers: Boolean) : FetchNextUsersResult
 
     data object Error : FetchNextUsersResult
 }

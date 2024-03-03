@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +34,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.domain.models.User
 import com.example.presentation.R
 import com.example.presentation.theme.GithubUsersTheme
+import com.example.presentation.viewmodels.FetchMoreState
+import com.example.presentation.viewmodels.FetchMoreState.Error
+import com.example.presentation.viewmodels.FetchMoreState.NoMoreItems
+import com.example.presentation.viewmodels.FetchMoreState.WaitingForMore
 import com.example.presentation.viewmodels.ListViewModel
 
 @Composable
@@ -40,23 +45,25 @@ fun ListRoute(
     onUserClick: (Int) -> Unit,
     viewModel: ListViewModel = hiltViewModel()
 ) {
-    val listState by viewModel.userListState.collectAsStateWithLifecycle()
-    val loadingState by viewModel.loadingState.collectAsStateWithLifecycle()
+    val userListState by viewModel.userListState.collectAsStateWithLifecycle()
+    val fetchMoreState by viewModel.fetchMoreState.collectAsStateWithLifecycle()
 
     ListScreen(
-        userListState = listState,
-        loadingState = loadingState,
+        userList = userListState,
+        fetchMoreState = fetchMoreState,
         onUserClick = onUserClick,
-        onScrolledToBottom = { viewModel.fetchNextUsers() }
+        onScrolledToBottom = { viewModel.attemptFetchMoreUsers() },
+        onRetryClick = { viewModel.attemptFetchMoreUsers() }
     )
 }
 
 @Composable
 fun ListScreen(
-    userListState: List<User>,
-    loadingState: Boolean,
+    userList: List<User>,
+    fetchMoreState: FetchMoreState,
     onUserClick: (Int) -> Unit,
-    onScrolledToBottom: () -> Unit
+    onScrolledToBottom: () -> Unit,
+    onRetryClick: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -64,12 +71,13 @@ fun ListScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         EndlessLazyColumn(
-            items = userListState,
+            items = userList,
             key = { it.id },
-            isLoading = loadingState,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            contentPadding = PaddingValues(vertical = 8.dp),
             onScrolledToBottom = onScrolledToBottom,
             itemContent = { UserItem(it, onUserClick) },
-            loadingItemContent = { LoadingItem() })
+            lastItemContent = { LastItem(fetchMoreState, onRetryClick) })
     }
 }
 
@@ -99,12 +107,18 @@ fun UserItem(
 }
 
 @Composable
-fun LoadingItem() {
+fun LastItem(fetchMoreState: FetchMoreState, onRetryClick: () -> Unit) {
+    val text = when (fetchMoreState) {
+        is WaitingForMore -> stringResource(R.string.waiting_fore_more_users)
+        is Error -> stringResource(R.string.failed_to_download_users_tap_to_retry)
+        is NoMoreItems -> stringResource(R.string.no_more_users_to_download)
+    }
+
     Text(
-        text = stringResource(R.string.loading),
+        text = text,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .clickable { if (fetchMoreState == Error) onRetryClick() },
         textAlign = TextAlign.Center
     )
 }
@@ -112,30 +126,34 @@ fun LoadingItem() {
 @Composable
 fun <T> EndlessLazyColumn(
     modifier: Modifier = Modifier,
-    isLoading: Boolean = false,
+    verticalArrangement: Arrangement.Vertical,
+    contentPadding: PaddingValues,
     listState: LazyListState = rememberLazyListState(),
     items: List<T>,
     key: ((item: T) -> Any)? = null,
     onScrolledToBottom: () -> Unit,
     itemContent: @Composable (T) -> Unit,
-    loadingItemContent: @Composable () -> Unit,
+    lastItemContent: @Composable () -> Unit,
 ) {
     val hasScrolledToBottom by remember { derivedStateOf { listState.hasScrolledToBottom() } }
 
     LaunchedEffect(hasScrolledToBottom) {
-        if (hasScrolledToBottom && !isLoading) onScrolledToBottom()
+        if (hasScrolledToBottom) onScrolledToBottom()
     }
 
-    LazyColumn(modifier = modifier, state = listState) {
+    LazyColumn(
+        modifier = modifier,
+        state = listState,
+        verticalArrangement = verticalArrangement,
+        contentPadding = contentPadding
+    ) {
         items(
             items = items,
             key = key,
         ) { item ->
             itemContent(item)
         }
-        if (isLoading) {
-            item { loadingItemContent() }
-        }
+        item { lastItemContent() }
     }
 }
 
@@ -145,10 +163,11 @@ fun <T> EndlessLazyColumn(
 fun ListScreenPreview() {
     GithubUsersTheme {
         ListScreen(
-            userListState = fakeUserList,
-            loadingState = true,
+            userList = fakeUserList,
+            fetchMoreState = WaitingForMore,
             onUserClick = {},
-            onScrolledToBottom = {}
+            onScrolledToBottom = {},
+            onRetryClick = {}
         )
     }
 }

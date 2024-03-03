@@ -1,7 +1,8 @@
 package com.example.data
 
 import com.example.data.api.GithubApi
-import com.example.data.api.models.GithubUser
+import com.example.data.api.STARTING_USER_ID
+import com.example.data.api.downloadUsersAsResult
 import com.example.data.database.dao.UserDao
 import com.example.data.utils.asExternalModelList
 import com.example.data.utils.toUserEntityList
@@ -16,9 +17,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
-
-
-private const val STARTING_USER_ID = 0
 
 internal class GithubUsersRepositoryImpl(
     private val githubApi: GithubApi,
@@ -44,16 +42,15 @@ internal class GithubUsersRepositoryImpl(
     }
 
     private suspend fun downloadAndStoreUsers(sinceId: Int): FetchNextUsersResult {
-        val downloadResult = downloadGithubUsers(sinceId)
+        val downloadResult = githubApi.downloadUsersAsResult(sinceId)
+            ?: return FetchNextUsersResult.Error
 
-        val githubUsers = downloadResult.getOrNull()
-        if (githubUsers == null) {
-            downloadResult.exceptionOrNull()?.printStackTrace()
-            return FetchNextUsersResult.Error
-        }
+        val githubUsers = downloadResult.githubUsers
+        val canFetchMoreUsers = downloadResult.canFetchMoreUsers
 
         userDao.insertOrIgnore(githubUsers.toUserEntityList())
-        return FetchNextUsersResult.Success
+
+        return FetchNextUsersResult.Success(canFetchMoreUsers)
     }
 
     private suspend fun getLastUserId(): Int {
@@ -63,8 +60,6 @@ internal class GithubUsersRepositoryImpl(
         return lastEmittedUser?.id ?: STARTING_USER_ID
     }
 
-    private suspend fun downloadGithubUsers(since: Int): Result<List<GithubUser>> = runCatching {
-        githubApi.getUsers(since)
-    }
+
 }
 

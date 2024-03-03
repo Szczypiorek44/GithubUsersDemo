@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">GithubUsers</string>
     <string name="loading">Loading…</string>
+    <string name="waiting_fore_more_users">Waiting for more users…</string>
+    <string name="failed_to_download_users_tap_to_retry">Failed to download users. Tap to retry</string>
+    <string name="no_more_users_to_download">No more users to download</string>
     <string name="user_not_found">User not found</string>
     <string name="name_value">Name: %1$s</string>
     <string name="userid_value">UserId: %1$s</string>
