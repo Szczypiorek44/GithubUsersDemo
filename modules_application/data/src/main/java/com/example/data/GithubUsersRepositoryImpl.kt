@@ -4,7 +4,7 @@ import com.example.data.api.GithubApi
 import com.example.data.api.STARTING_USER_ID
 import com.example.data.api.downloadUsersAsResult
 import com.example.data.database.dao.UserDao
-import com.example.data.utils.asExternalModelList
+import com.example.data.utils.asDomainModelList
 import com.example.data.utils.toUserEntityList
 import com.example.domain.models.FetchNextUsersResult
 import com.example.domain.models.User
@@ -21,12 +21,12 @@ import kotlinx.coroutines.withContext
 internal class GithubUsersRepositoryImpl(
     private val githubApi: GithubApi,
     private val userDao: UserDao,
-    private val scope: CoroutineScope,
     private val ioDispatcher: CoroutineDispatcher,
+    scope: CoroutineScope,
 ) : GithubUsersRepository {
 
     private val usersFlow = userDao.observeEntities()
-        .map { it.asExternalModelList() }
+        .map { it.asDomainModelList() }
         .shareIn(scope, started = SharingStarted.Lazily, replay = 1)
 
     override fun observeUsers(): Flow<List<User>> = usersFlow

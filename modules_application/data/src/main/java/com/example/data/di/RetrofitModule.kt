@@ -26,6 +26,7 @@ object RetrofitModule {
     }
 
     @Provides
+    @Singleton
     fun provideRetrofit(okHttpCallFactory: dagger.Lazy<Call.Factory>): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)

@@ -24,6 +24,6 @@ object DataModule {
         @ApplicationScope scope: CoroutineScope,
         @Dispatcher(DispatcherType.IO) ioDispatcher: CoroutineDispatcher,
     ): GithubUsersRepository =
-        GithubUsersRepositoryImpl(githubApi, userDao, scope, ioDispatcher)
+        GithubUsersRepositoryImpl(githubApi, userDao, ioDispatcher, scope)
 
 }
