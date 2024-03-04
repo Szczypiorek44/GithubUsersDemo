@@ -14,10 +14,15 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "GithubUsers"
-include(":data", ":domain", ":presentation", ":app", ":common")
+include(":app")
 
-project(":app").projectDir = file("modules_application/app")
-project(":data").projectDir = file("modules_application/data")
-project(":domain").projectDir = file("modules_application/domain")
-project(":presentation").projectDir = file("modules_application/presentation")
-project(":common").projectDir = file("modules_other/common")
+include(":features:details")
+include(":features:list")
+
+include(":domain")
+include(":data")
+
+include(":common")
+
+
+
