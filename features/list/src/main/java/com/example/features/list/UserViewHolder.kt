@@ -25,7 +25,7 @@ class UserViewHolder(
     fun bind(user: User) {
         this.user = user
 
-        binding.nameTextView.text = user.name
+        binding.nameTextView.text = "Item${user.id}"
 
     }
 }

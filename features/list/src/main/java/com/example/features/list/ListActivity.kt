@@ -25,6 +25,7 @@ class ListActivity : AppCompatActivity() {
         binding = ActivityListBinding.inflate(layoutInflater)
         val view = binding.root
 
+        binding.recyclerView.layoutManager = CustomGridLayoutManager(this, 2, 5)
         binding.recyclerView.adapter = adapter
 
         observeEvents()
