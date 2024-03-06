@@ -1,10 +1,8 @@
+Simple list screen with custom layout manager
+
 Ingredients:
 - Clean Architecture & MVVM
-- Coroutines & Compose
+- Coroutines
 - Hilt
 - Room & Retrofit
 - Junit & Turbine
-- Coil
-
-TODO:
-- Toml
