@@ -50,9 +50,10 @@ internal class GithubUsersRepositoryImpl(
         val githubUsers = downloadResult.githubUsers
         val canFetchMoreUsers = downloadResult.canFetchMoreUsers
 
-        val countryAndState = randomGenerator.getRandomCountryAndState()
+        val userEntities = githubUsers.toUserEntityList(
+            countryAndStateProvider = { randomGenerator.getCountryAndState() })
 
-        userDao.insertOrIgnore(githubUsers.toUserEntityList(countryAndState))
+        userDao.insertOrIgnore(userEntities)
 
         return FetchNextUsersResult.Success(canFetchMoreUsers)
     }

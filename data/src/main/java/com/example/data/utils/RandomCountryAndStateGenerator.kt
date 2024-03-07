@@ -20,7 +20,7 @@ class RandomCountryAndStateGenerator {
         CountryAndState("Colombia", "Antioquia")
     )
 
-    fun getRandomCountryAndState(): CountryAndState {
+    fun getCountryAndState(): CountryAndState {
         return countriesAndStates.random()
     }
 
