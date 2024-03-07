@@ -4,6 +4,7 @@ import com.example.data.api.GithubApi
 import com.example.data.api.STARTING_USER_ID
 import com.example.data.api.downloadUsersAsResult
 import com.example.data.database.dao.UserDao
+import com.example.data.utils.RandomCountryAndStateGenerator
 import com.example.data.utils.asDomainModelList
 import com.example.data.utils.toUserEntityList
 import com.example.domain.models.FetchNextUsersResult
@@ -21,6 +22,7 @@ import kotlinx.coroutines.withContext
 internal class GithubUsersRepositoryImpl(
     private val githubApi: GithubApi,
     private val userDao: UserDao,
+    private val randomGenerator: RandomCountryAndStateGenerator,
     private val ioDispatcher: CoroutineDispatcher,
     scope: CoroutineScope,
 ) : GithubUsersRepository {
@@ -48,7 +50,9 @@ internal class GithubUsersRepositoryImpl(
         val githubUsers = downloadResult.githubUsers
         val canFetchMoreUsers = downloadResult.canFetchMoreUsers
 
-        userDao.insertOrIgnore(githubUsers.toUserEntityList())
+        val countryAndState = randomGenerator.getRandomCountryAndState()
+
+        userDao.insertOrIgnore(githubUsers.toUserEntityList(countryAndState))
 
         return FetchNextUsersResult.Success(canFetchMoreUsers)
     }

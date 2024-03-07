@@ -3,6 +3,7 @@ package com.example.data.di
 import com.example.data.GithubUsersRepositoryImpl
 import com.example.data.api.GithubApi
 import com.example.data.database.dao.UserDao
+import com.example.data.utils.RandomCountryAndStateGenerator
 import com.example.domain.repositories.GithubUsersRepository
 import dagger.Module
 import dagger.Provides
@@ -21,9 +22,20 @@ object DataModule {
     fun provideGithubUsersRepository(
         githubApi: GithubApi,
         userDao: UserDao,
+        randomCountryAndStateGenerator: RandomCountryAndStateGenerator,
         @ApplicationScope scope: CoroutineScope,
         @Dispatcher(DispatcherType.IO) ioDispatcher: CoroutineDispatcher,
     ): GithubUsersRepository =
-        GithubUsersRepositoryImpl(githubApi, userDao, ioDispatcher, scope)
+        GithubUsersRepositoryImpl(
+            githubApi,
+            userDao,
+            randomCountryAndStateGenerator,
+            ioDispatcher,
+            scope
+        )
 
+    @Provides
+    @Singleton
+    fun provideRandomCountryAndStateGenerator()
+            : RandomCountryAndStateGenerator = RandomCountryAndStateGenerator()
 }

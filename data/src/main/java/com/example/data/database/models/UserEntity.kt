@@ -8,5 +8,7 @@ data class UserEntity(
     @PrimaryKey
     val id: Int,
     val name: String,
-    val avatarUrl: String
+    val avatarUrl: String,
+    val countryName: String,
+    val stateName: String
 )
