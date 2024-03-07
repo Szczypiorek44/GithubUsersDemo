@@ -20,13 +20,14 @@ fun UserEntity.asDomainModel() = User(
 
 
 fun List<GithubUser>.toUserEntityList(countryAndStateProvider: () -> CountryAndState): List<UserEntity> =
-    this.map {
+    map {
+        val countryAndState = countryAndStateProvider()
         UserEntity(
             id = it.id,
             name = it.login,
             avatarUrl = it.avatarUrl,
-            countryName = countryAndStateProvider().countryName,
-            stateName = countryAndStateProvider().stateName
+            countryName = countryAndState.countryName,
+            stateName = countryAndState.stateName
         )
     }
 
