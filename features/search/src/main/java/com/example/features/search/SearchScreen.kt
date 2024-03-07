@@ -1,8 +1,9 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.features.search
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -11,9 +12,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -57,17 +64,34 @@ fun SearchScreen(
     userList: List<User>,
     onSearchCitiesClick: (String) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        item { TextInputRow(onSearchCitiesClick) }
-        items(
-            items = userList,
-            key = { it.id },
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = BostonBlue,
+                titleContentColor = MaterialTheme.colorScheme.primary,
+            ),
+            title = {
+                Text(
+                    text = stringResource(R.string.search),
+                    color = White,
+                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Light),
+                )
+            }
+        )
+    }) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier.padding(paddingValues)
         ) {
-            UserItem(user = it)
+            item { TextInputRow(onSearchCitiesClick) }
+            items(
+                items = userList,
+                key = { it.id },
+            ) {
+                UserItem(user = it)
+            }
         }
     }
+
 }
 
 @Composable
@@ -134,7 +158,7 @@ fun TextInputRow(onSearchCitiesClick: (String) -> Unit) {
         Divider(
             modifier = Modifier
                 .constrainAs(bottomDivider) {
-                    top.linkTo(searchButton.bottom, margin = 10.dp)
+                    top.linkTo(searchButton.bottom, margin = 15.dp)
                 }
                 .fillMaxWidth()
                 .height(1.dp),
