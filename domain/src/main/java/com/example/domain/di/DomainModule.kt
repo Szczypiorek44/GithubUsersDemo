@@ -3,6 +3,8 @@ package com.example.domain.di
 import com.example.domain.repositories.GithubUsersRepository
 import com.example.domain.usecases.FetchNextUsersUseCase
 import com.example.domain.usecases.FetchNextUsersUseCaseImpl
+import com.example.domain.usecases.GetFilteredUsersUseCase
+import com.example.domain.usecases.GetFilteredUsersUseCaseImpl
 import com.example.domain.usecases.GetUserUseCase
 import com.example.domain.usecases.GetUserUseCaseImpl
 import com.example.domain.usecases.ObserveUsersUseCase
@@ -21,6 +23,12 @@ object DomainModule {
         githubUsersRepository: GithubUsersRepository
     ): FetchNextUsersUseCase =
         FetchNextUsersUseCaseImpl(githubUsersRepository)
+
+    @Provides
+    fun provideGetFilteredUsersUseCase(
+        githubUsersRepository: GithubUsersRepository
+    ): GetFilteredUsersUseCase =
+        GetFilteredUsersUseCaseImpl(githubUsersRepository)
 
     @Provides
     fun provideGetUserUseCase(
