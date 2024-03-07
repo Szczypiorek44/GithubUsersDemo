@@ -18,6 +18,7 @@ include(":app")
 
 include(":features:details")
 include(":features:list")
+include(":features:search")
 
 include(":domain")
 include(":data")

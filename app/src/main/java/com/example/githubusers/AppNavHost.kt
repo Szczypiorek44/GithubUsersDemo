@@ -8,6 +8,8 @@ import com.example.features.details.detailsScreen
 import com.example.features.details.navigateToDetails
 import com.example.features.list.USER_LIST_ROUTE
 import com.example.features.list.listScreen
+import com.example.features.search.navigateToSearch
+import com.example.features.search.searchScreen
 
 
 @Composable
@@ -22,8 +24,10 @@ fun AppNavHost(
         startDestination = startDestination
     ) {
         listScreen(
-            onUserClick = { navController.navigateToDetails(it) }
+            onUserClick = { navController.navigateToDetails(it) },
+            onSearchClick = { navController.navigateToSearch() }
         )
         detailsScreen()
+        searchScreen()
     }
 }

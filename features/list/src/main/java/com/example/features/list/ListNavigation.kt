@@ -10,8 +10,11 @@ const val USER_LIST_ROUTE = "user_list_route"
 fun NavController.navigateToList(navOptions: NavOptions? = null) =
     navigate(USER_LIST_ROUTE, navOptions)
 
-fun NavGraphBuilder.listScreen(onUserClick: (Int) -> Unit) {
+fun NavGraphBuilder.listScreen(onUserClick: (Int) -> Unit, onSearchClick: () -> Unit) {
     composable(route = USER_LIST_ROUTE) {
-        ListRoute(onUserClick)
+        ListRoute(
+            onUserClick = onUserClick,
+            onSearchClick = onSearchClick
+        )
     }
 }

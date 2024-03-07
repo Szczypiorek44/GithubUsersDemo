@@ -4,23 +4,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
@@ -42,6 +44,7 @@ import com.example.features.list.FetchMoreState.WaitingForMore
 @Composable
 fun ListRoute(
     onUserClick: (Int) -> Unit,
+    onSearchClick: () -> Unit,
     viewModel: ListViewModel = hiltViewModel()
 ) {
     val userListState by viewModel.userListState.collectAsStateWithLifecycle()
@@ -51,6 +54,7 @@ fun ListRoute(
         userList = userListState,
         fetchMoreState = fetchMoreState,
         onUserClick = onUserClick,
+        onSearchClick = onSearchClick,
         onScrolledToBottom = { viewModel.attemptFetchMoreUsers() },
         onRetryClick = { viewModel.attemptFetchMoreUsers() }
     )
@@ -61,15 +65,17 @@ fun ListScreen(
     userList: List<User>,
     fetchMoreState: FetchMoreState,
     onUserClick: (Int) -> Unit,
+    onSearchClick: () -> Unit,
     onScrolledToBottom: () -> Unit,
     onRetryClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Scaffold(floatingActionButton = {
+        FloatingActionButton(onClick = { onSearchClick() }) {
+            Icon(Icons.Filled.Search, "Floating action button.")
+        }
+    }) { innerPadding ->
         EndlessLazyColumn(
+            modifier = Modifier.padding(innerPadding),
             items = userList,
             key = { it.id },
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -77,6 +83,7 @@ fun ListScreen(
             onScrolledToBottom = onScrolledToBottom,
             itemContent = { UserItem(it, onUserClick) },
             lastItemContent = { LastItem(fetchMoreState, onRetryClick) })
+
     }
 }
 
@@ -165,6 +172,7 @@ fun ListScreenPreview() {
             userList = fakeUserList,
             fetchMoreState = WaitingForMore,
             onUserClick = {},
+            onSearchClick = {},
             onScrolledToBottom = {},
             onRetryClick = {}
         )

@@ -58,6 +58,7 @@ kapt {
 dependencies {
     implementation(project(":features:details"))
     implementation(project(":features:list"))
+    implementation(project(":features:search"))
 
     implementation(project(":domain"))
     implementation(project(":data"))

@@ -39,6 +39,8 @@ dependencies {
     api("androidx.compose.ui:ui-tooling-preview")
     api("androidx.compose.material3:material3")
 
+    api("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
     api("androidx.navigation:navigation-compose:2.7.7")
 
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
