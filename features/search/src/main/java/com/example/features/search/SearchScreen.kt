@@ -1,16 +1,19 @@
 package com.example.features.search
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Divider
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,6 +35,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.common.R
+import com.example.common.theme.BostonBlue
 import com.example.common.theme.GithubUsersTheme
 import com.example.domain.models.User
 
@@ -41,40 +48,98 @@ fun SearchRoute(
 
     SearchScreen(
         userList = userListState,
-        onFilterTextChange = { viewModel.searchUsersBy(it) }
+        onSearchCitiesClick = { viewModel.searchUsersBy(it) }
     )
 }
 
 @Composable
 fun SearchScreen(
     userList: List<User>,
-    onFilterTextChange: (String) -> Unit
+    onSearchCitiesClick: (String) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        item { TextInputRow(onSearchCitiesClick) }
+        items(
+            items = userList,
+            key = { it.id },
+        ) {
+            UserItem(user = it)
+        }
+    }
+}
+
+@Composable
+fun TextInputRow(onSearchCitiesClick: (String) -> Unit) {
+    ConstraintLayout {
         var text by rememberSaveable { mutableStateOf("") }
 
-        TextField(
+        val (searchCitiesField, searchButton, fieldDivider, bottomDivider) = createRefs()
+        BasicTextField(
             modifier = Modifier
-                .wrapContentSize()
-                .fillMaxWidth(),
+                .constrainAs(searchCitiesField) {
+                    start.linkTo(parent.start, margin = 16.dp)
+                    end.linkTo(searchButton.start, margin = 16.dp)
+                    bottom.linkTo(searchButton.bottom)
+                    width = Dimension.fillToConstraints
+                }
+                .padding(bottom = 8.dp),
             value = text,
-            onValueChange = {
-                onFilterTextChange(it)
-                text = it
-            },
-            label = { Text("Enter filter name (at least 2 chars)") }
+            singleLine = true,
+            textStyle = TextStyle(fontSize = 16.sp),
+            onValueChange = { text = it },
+            decorationBox = { innerTextField ->
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (text.isEmpty()) {
+                        Text(
+                            text = stringResource(id = R.string.search_cities),
+                            color = Gray,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+                innerTextField()
+            }
         )
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(
-                items = userList,
-                key = { it.id },
-            ) {
-                UserItem(user = it)
-            }
+        Divider(
+            modifier = Modifier
+                .constrainAs(fieldDivider) {
+                    bottom.linkTo(searchCitiesField.bottom)
+                    start.linkTo(searchCitiesField.start)
+                    end.linkTo(searchCitiesField.end)
+                    width = Dimension.fillToConstraints
+                }
+                .fillMaxWidth()
+                .height(1.dp),
+            color = Gray
+        )
+
+        OutlinedButton(
+            modifier = Modifier
+                .constrainAs(searchButton) {
+                    top.linkTo(parent.top, margin = 20.dp)
+                    end.linkTo(parent.end, margin = 12.dp)
+                    height = Dimension.fillToConstraints
+                },
+            border = BorderStroke(1.dp, BostonBlue),
+            shape = RoundedCornerShape(5.dp),
+            onClick = { onSearchCitiesClick(text) }) {
+            Text(text = stringResource(id = R.string.search))
         }
+
+        Divider(
+            modifier = Modifier
+                .constrainAs(bottomDivider) {
+                    top.linkTo(searchButton.bottom, margin = 10.dp)
+                }
+                .fillMaxWidth()
+                .height(1.dp),
+            color = LightGray
+        )
     }
 }
 
@@ -87,12 +152,12 @@ fun UserItem(
             .wrapContentHeight()
             .fillMaxWidth()
     ) {
-        val (name, country, state, divider) = createRefs()
+        val (nameText, countryText, stateText, divider) = createRefs()
 
         Text(
-            modifier = Modifier.constrainAs(name) {
+            modifier = Modifier.constrainAs(nameText) {
                 top.linkTo(parent.top, margin = 12.dp)
-                start.linkTo(parent.start, margin = 12.dp)
+                start.linkTo(parent.start, margin = 16.dp)
             },
             text = user.name.uppercase(),
             fontWeight = FontWeight.Medium,
@@ -103,10 +168,10 @@ fun UserItem(
         val verticalGuideline = createGuidelineFromStart(0.5f)
 
         Text(
-            modifier = Modifier.constrainAs(state) {
-                start.linkTo(name.start)
+            modifier = Modifier.constrainAs(stateText) {
+                start.linkTo(nameText.start)
                 end.linkTo(verticalGuideline)
-                top.linkTo(name.bottom, margin = 6.dp)
+                top.linkTo(nameText.bottom, margin = 6.dp)
                 width = Dimension.fillToConstraints
             },
             text = user.stateName,
@@ -117,10 +182,10 @@ fun UserItem(
 
         Text(
             modifier = Modifier
-                .constrainAs(country) {
+                .constrainAs(countryText) {
                     start.linkTo(verticalGuideline, margin = 4.dp)
-                    end.linkTo(parent.end, margin = 12.dp)
-                    bottom.linkTo(state.bottom, margin = 2.dp)
+                    end.linkTo(parent.end, margin = 16.dp)
+                    bottom.linkTo(stateText.bottom, margin = 2.dp)
                     width = Dimension.fillToConstraints
                 },
             text = user.countryName,
@@ -134,7 +199,7 @@ fun UserItem(
         Divider(
             modifier = Modifier
                 .constrainAs(divider) {
-                    top.linkTo(state.bottom, margin = 10.dp)
+                    top.linkTo(stateText.bottom, margin = 10.dp)
                     bottom.linkTo(parent.bottom)
                 }
                 .fillMaxWidth()
@@ -151,7 +216,7 @@ fun ListScreenPreview() {
     GithubUsersTheme {
         SearchScreen(
             userList = fakeUserList,
-            onFilterTextChange = {}
+            onSearchCitiesClick = {}
         )
     }
 }
