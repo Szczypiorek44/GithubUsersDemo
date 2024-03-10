@@ -27,6 +27,8 @@ class ListActivity : AppCompatActivity() {
 
         binding.recyclerView.layoutManager = CustomGridLayoutManager(this, 2, 5)
         binding.recyclerView.adapter = adapter
+        val snapHelper = CustomSnapHelper(10)
+        snapHelper.attachToRecyclerView(binding.recyclerView)
 
         observeEvents()
 
